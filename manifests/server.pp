@@ -12,8 +12,10 @@ class ssh::server(
     ''      => $options,
     default => $hiera_options,
   }
+  notify {"ssh::server fin_options are: ${fin_options}": }
 
   $merged_options = merge($ssh::params::sshd_default_options, $fin_options)
+  notify {"ssh::server merged_options are: ${merged_options}": }
 
   include ssh::server::install
   include ssh::server::config
