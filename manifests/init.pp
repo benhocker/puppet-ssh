@@ -11,9 +11,6 @@ class ssh (
   validate_hash($users_client_options)
   validate_bool($storeconfigs_enabled)
 
-  notify {"ssh::server_options are: ${ssh::server_options}": }
-  notify {"server_options are: ${server_options}": }
-
   # Merge hashes from multiple layer of hierarchy in hiera
   $hiera_server_options = hiera_hash("${module_name}::server_options", undef)
   $hiera_client_options = hiera_hash("${module_name}::client_options", undef)
@@ -33,6 +30,11 @@ class ssh (
     undef   => $users_client_options,
     default => $hiera_users_client_options,
   }
+
+  notify {"ssh::server_options are: ${ssh::server_options}": }
+  notify {"server_options are: ${server_options}": }
+  notify {"module_name is: ${module_name}": }
+  notify {"fin_server_options are: ${fin_server_options}": }
 
   class { 'ssh::server':
     ensure               => $version,
