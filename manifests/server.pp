@@ -4,13 +4,10 @@ class ssh::server(
   $options              = {}
 ) inherits ssh::params {
 
-  # Merge hashes from multiple layer of hierarchy in hiera
-  $hiera_options = hiera_hash("${module_name}::server::options", undef)
-
-  $fin_options = $hiera_options ? {
-    undef   => $options,
-    ''      => $options,
-    default => $hiera_options,
+  $fin_options = $ssh::server::options ? {
+    undef   => $ssh::params::sshd_default_options,
+    ''      => $ssh::params::sshd_default_options,
+    default => $ssh::server::options,
   }
   notify {"ssh::server fin_options are: ${fin_options}": }
 

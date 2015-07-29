@@ -11,42 +11,22 @@ class ssh (
   validate_hash($users_client_options)
   validate_bool($storeconfigs_enabled)
 
-  # Merge hashes from multiple layer of hierarchy in hiera
-  $hiera_server_options = hiera_hash("${module_name}::server_options", undef)
-  $hiera_client_options = hiera_hash("${module_name}::client_options", undef)
-  $hiera_users_client_options = hiera_hash("${module_name}::users_client_options", undef)
-
-  $fin_server_options = $hiera_server_options ? {
-    undef   => $server_options,
-    default => $hiera_server_options,
-  }
-
-  $fin_client_options = $hiera_client_options ? {
-    undef   => $client_options,
-    default => $hiera_client_options,
-  }
-
-  $fin_users_client_options = $hiera_users_client_options ? {
-    undef   => $users_client_options,
-    default => $hiera_users_client_options,
-  }
-
   notify {"ssh::server_options are: ${ssh::server_options}": }
   notify {"server_options are: ${server_options}": }
-  notify {"module_name is: ${module_name}": }
-  notify {"fin_server_options are: ${fin_server_options}": }
+  #notify {"module_name is: ${module_name}": }
+  #notify {"fin_server_options are: ${fin_server_options}": }
 
   class { 'ssh::server':
-    ensure               => $version,
-    storeconfigs_enabled => $storeconfigs_enabled,
-    options              => $fin_server_options,
+    ensure               => $ssh::version,
+    storeconfigs_enabled => $ssh::storeconfigs_enabled,
+    options              => $ssh::server_options,
   }
 
   class { 'ssh::client':
-    ensure               => $version,
-    storeconfigs_enabled => $storeconfigs_enabled,
-    options              => $fin_client_options,
+    ensure               => $ssh::version,
+    storeconfigs_enabled => $ssh::storeconfigs_enabled,
+    options              => $ssh::client_options,
   }
 
-  create_resources('::ssh::client::config::user', $fin_users_client_options)
+  create_resources('::ssh::client::config::user', $ssh::users_client_options)
 }
